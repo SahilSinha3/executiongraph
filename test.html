@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite + React + TS</title>
+  <script type="module" crossorigin src="https://s27platformmediahivegpt.blob.core.windows.net/hiveai/execution-graph/index-Una5jAN_.js"></script>
+  <link rel="stylesheet" crossorigin href="https://s27platformmediahivegpt.blob.core.windows.net/hiveai/execution-graph/index-D35N9qfy.css">
+</head>
+
+<body>
+  <execution-graph id="execution-graph"></execution-graph>
+
+  <script>
+    // JSON data to send to the web component
+    const flowJSON = { "flowId": "agent-execution-flow-2024", "flowCode": { "groups": { "pre-agent": { "id": "pre-agent-group", "name": "Pre-Agent", "metadata": { "icon": "⚙️", "color": "#e1f5fe", "borderColor": "#01579b" }, "nodes": [{ "id": "Early Intent Detection", "label": "Early Intent", "type": "LLM Call", "metadata": { "icon": "https://e1cdn.social27.com/hiveai/models_icons/llama3_1_70b.png", "model": "Llama3.1-70B", "time_taken": "0.76s", "shape": "rectangle" }, "connections": { "next": ["Brand and Inspiration Documents Processing"], "conditions": [] } }, { "id": "Brand and Inspiration Documents Processing", "type": "preprocess", "label": "Doc Processing", "metadata": { "icon": "https://cdn-icons-png.flaticon.com/128/1865/1865497.png", "time_taken": "1.08s", "documents_processed_chunk_count": 17 }, "connections": { "next": ["Analyzing Brand and Inspiration for User Intent"], "conditions": [] } }, { "id": "Analyzing Brand and Inspiration for User Intent", "type": "LLM Call", "label": "Brand Intent", "metadata": { "icon": "https://e1cdn.social27.com/hiveai/models_icons/gpt_4o_mini.png", "model": "gpt-4o-mini", "time_taken": "12.33s", "shape": "rectangle" }, "connections": { "next": ["Assign System Agents"], "conditions": [] } }, { "id": "Assign System Agents", "label": "System Agents", "type": "LLM Call", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/workflow-Icons/editprocess.svg", "time_taken": "13.59s", "system_agents_count": 6 }, "connections": { "next": ["Assign User Proxy And Assistant Agents"], "conditions": [] } }, { "id": "Assign User Proxy And Assistant Agents", "label": "User Proxy And Assistant Agents", "type": "LLM Call", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/workflow-Icons/editprocess.svg", "time_taken": "25.39s", "system_agents_count": 6 }, "connections": { "next": ["agent-0"], "conditions": [] } }] }, "post-agent": { "id": "post-agent-group", "name": "Post-Agent", "metadata": { "icon": "⚙️", "color": "#e1f5fe", "borderColor": "#01579b" }, "nodes": [{ "id": "agent-0", "type": "process", "label": "User", "metadata": { "icon": "", "role": "user", "time_taken": "0.00s", "token_count": 7572, "shape": "rectangle" }, "connections": { "next": ["agent-1"], "conditions": [] } }, { "id": "agent-1", "type": "process", "label": "Online Search Terms Generator", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/Search_Topics_Generator.png", "role": "assistant", "time_taken": "0.00s", "token_count": 0, "shape": "rectangle" }, "connections": { "next": ["agent-2"], "conditions": [] } }, { "id": "agent-2", "type": "process", "label": "Generate Keyword Based Search Terms", "metadata": { "icon": "", "role": "function", "time_taken": "0.00s", "token_count": 46, "shape": "rectangle" }, "connections": { "next": ["agent-3"], "conditions": [] } }, { "id": "agent-3", "type": "process", "label": "Smart Search Snippets", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/competitive_analysis.svg", "role": "assistant", "time_taken": "5.33s", "token_count": 0, "shape": "rectangle" }, "connections": { "next": ["end"], "conditions": [] } }] } }, "controlNodes": { "start": { "id": "start", "type": "start", "label": "Execute Workflow", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/workflow-Icons/workflow-01Starting.svg", "shape": "circle" }, "connections": { "next": ["Early Intent Detection"] } }, "end": { "id": "end", "type": "end", "label": "Execution Complete", "metadata": { "icon": "https://e1cdn.social27.com/digitalevents/hivegpt-icons/workflow-Icons/workflow-02Starting.svg", "shape": "circle" }, "connections": { "next": [] } } }, "metadata": { "flowType": "agent-execution", "version": "2.0", "supportedFeatures": ["conditional-branching", "error-handling", "loops", "group-based-execution"] } } }
+
+    // Set the flow-json attribute on the execution-graph web component
+    const executionGraph = document.getElementById("execution-graph");
+    executionGraph.setAttribute("flow-json", JSON.stringify(flowJSON));
+  </script>
+</body>
+
+</html>
