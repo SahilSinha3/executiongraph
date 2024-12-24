@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { NodeLabel } from './NodeLabel';
 import type { Node as NodeType } from '../../types/graph';
 import { getNodeColor, getNodeBorder } from '../../utils/colors';
 import { getIconForNode } from '../../utils/icons';
 
-const EXCLUDED_KEYS = ['iconType', 'color', 'shape', 'icon']; // exclude these keys at top level
+const EXCLUDED_KEYS = ['iconType', 'color', 'shape', 'icon'];
 
 interface NodeProps {
   node: NodeType;
@@ -25,7 +25,7 @@ function isUrl(str: string) {
 function renderMetadata(key: string, value: any, depth = 0): JSX.Element {
   const indent = { paddingLeft: `${depth * 10}px` };
 
-  // Helper function to format keys (replace "_" with " " and capitalize words)
+  // Helper function to format keys
   const formatKey = (str: string) =>
     str
       .split('_')
@@ -33,7 +33,6 @@ function renderMetadata(key: string, value: any, depth = 0): JSX.Element {
       .join(' ');
 
   if (key === 'search' && value.providers && Array.isArray(value.providers)) {
-    // Custom rendering for search providers
     const maxVisible = 5;
     const visibleProviders = value.providers.slice(0, maxVisible);
     const remainingCount = value.providers.length - maxVisible;
@@ -117,7 +116,6 @@ function renderMetadata(key: string, value: any, depth = 0): JSX.Element {
   }
 }
 
-
 function renderIcon(icon: string | undefined, label: string) {
   if (!icon) {
     // Fallback to first letter of the label
@@ -156,7 +154,7 @@ function renderIcon(icon: string | undefined, label: string) {
   );
 }
 
-export function Node({ node, selected, onClick }: NodeProps) {
+function NodeComponent({ node, selected, onClick }: NodeProps) {
   const [hovered, setHovered] = useState(false);
   const isControlNode = node.type === 'start' || node.type === 'end';
   const isStartNode = node.type === 'start';
@@ -165,20 +163,21 @@ export function Node({ node, selected, onClick }: NodeProps) {
   const borderColor = getNodeBorder(node.type, node.group);
   const customIcon = getIconForNode(node.id);
 
+  /* Removed heavy "transition-all duration-300" to reduce CPU usage on hover. 
+     If you want a slight hover effect, you can keep a shorter or simpler transition. */
   const baseClasses = `
-    cursor-pointer transition-all duration-300
+    cursor-pointer 
     flex items-center justify-center
-    ${selected ? 'ring-4 ring-blue-400 ring-opacity-50 scale-110' : 'hover:scale-105'}
+    ${selected ? 'ring-4 ring-blue-400 ring-opacity-50 scale-105' : 'hover:scale-105'}
     shadow-lg hover:shadow-xl
     relative
   `;
 
-  // Conditional shape classes
   const shapeClasses = isStartNode
     ? 'w-28 h-20 rounded-l-full' 
     : isEndNode
-    ? 'w-28 h-20 rounded-r-full z-10' 
-    : 'w-20 h-20 rounded-full';
+      ? 'w-28 h-20 rounded-r-full z-10' 
+      : 'w-20 h-20 rounded-full';
 
   return (
     <div
@@ -239,15 +238,15 @@ export function Node({ node, selected, onClick }: NodeProps) {
       )}
 
       {/* LLM Indicator */}
-        {node.metadata?.llm && (
-          <div className="absolute -bottom-1 -right-1">
-            <img
-              src={node.metadata.llm.icon}
-              alt={node.metadata.llm.model}
-              className="w-6 h-6 rounded-full bg-white shadow-sm"
-            />
-          </div>
-        )}
+      {node.metadata?.llm && (
+        <div className="absolute -bottom-1 -right-1">
+          <img
+            src={node.metadata.llm.icon}
+            alt={node.metadata.llm.model}
+            className="w-6 h-6 rounded-full bg-white shadow-sm"
+          />
+        </div>
+      )}
 
       {/* Metadata Tooltip */}
       {hovered && (
@@ -274,3 +273,6 @@ export function Node({ node, selected, onClick }: NodeProps) {
     </div>
   );
 }
+
+/* Memoize the Node component to avoid unnecessary re-renders */
+export const Node = React.memo(NodeComponent);

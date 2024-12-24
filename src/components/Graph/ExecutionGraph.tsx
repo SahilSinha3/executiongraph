@@ -21,25 +21,28 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
   const { nodes, edges } = transformGraphData(data);
 
   useEffect(() => {
+    // Reset color index so each new instance starts fresh
     resetColorIndex();
+    // Calculate positions for nodes once
     const newPositions = calculateNodePositions(nodes, 1600, 800, data);
     setPositions(newPositions);
-  }, [data]);
+  }, [data, nodes]);
 
   useEffect(() => {
+    // Adjust the view to fit the nodes just once (or if container changes size)
     const adjustGraphToFit = () => {
       const container = containerRef.current;
       if (!container) return;
 
-      // Calculate bounding box of all nodes and edges
+      // Calculate bounding box of all nodes
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-      // Include node positions in the bounding box
+      // Include node positions
       nodes.forEach((node) => {
         const pos = positions[node.id];
         if (!pos) return;
         const isControlNode = node.type === 'start' || node.type === 'end';
-        const nodeWidth = isControlNode ? 120 : 80; // Adjust for control and normal nodes
+        const nodeWidth = isControlNode ? 120 : 80;
         const nodeHeight = isControlNode ? 60 : 80;
 
         if (pos.x < minX) minX = pos.x;
@@ -48,33 +51,27 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
         if (pos.y + nodeHeight > maxY) maxY = pos.y + nodeHeight;
       });
 
-      // Include edge positions (for padding)
+      // Include edge positions for some padding
       edges.forEach(({ source, target }) => {
-        const start = positions[source];
-        const end = positions[target];
-        if (!start || !end) return;
-
-        const edgePadding = 20; // Add some padding for edges
-        minX = Math.min(minX, start.x - edgePadding, end.x - edgePadding);
-        minY = Math.min(minY, start.y - edgePadding, end.y - edgePadding);
-        maxX = Math.max(maxX, start.x + edgePadding, end.x + edgePadding);
-        maxY = Math.max(maxY, start.y + edgePadding, end.y + edgePadding);
+        const startPos = positions[source];
+        const endPos = positions[target];
+        if (!startPos || !endPos) return;
+        const edgePadding = 20;
+        minX = Math.min(minX, startPos.x - edgePadding, endPos.x - edgePadding);
+        minY = Math.min(minY, startPos.y - edgePadding, endPos.y - edgePadding);
+        maxX = Math.max(maxX, startPos.x + edgePadding, endPos.x + edgePadding);
+        maxY = Math.max(maxY, startPos.y + edgePadding, endPos.y + edgePadding);
       });
 
-      // Calculate dimensions of the bounding box
       const contentWidth = maxX - minX;
       const contentHeight = maxY - minY;
-
-      // Get container dimensions
       const containerWidth = container.offsetWidth;
       const containerHeight = container.offsetHeight;
 
-      // Calculate scale factor to fit the content within the container
       const scaleX = containerWidth / contentWidth;
       const scaleY = containerHeight / contentHeight;
       const scale = Math.min(scaleX, scaleY);
 
-      // Calculate translation to center the graph
       const translateX = -minX * scale + (containerWidth - contentWidth * scale) / 2;
       const translateY = -minY * scale + (containerHeight - contentHeight * scale) / 2;
 
@@ -82,7 +79,10 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
       setSvgDimensions({ width: contentWidth, height: contentHeight });
     };
 
+    // Run once right after positions are set
     adjustGraphToFit();
+
+    // If you do NOT want to recalc on every window resize, you can remove below:
     window.addEventListener('resize', adjustGraphToFit);
     return () => window.removeEventListener('resize', adjustGraphToFit);
   }, [nodes, edges, positions]);
@@ -123,7 +123,13 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
               >
                 <polygon
                   points="0 0, 8 3.5, 0 7"
-                  fill={type === 'error' ? '#EF4444' : type === 'condition' ? '#8B5CF6' : '#94A3B8'}
+                  fill={
+                    type === 'error'
+                      ? '#EF4444'
+                      : type === 'condition'
+                      ? '#8B5CF6'
+                      : '#94A3B8'
+                  }
                 />
               </marker>
             ))}
@@ -131,15 +137,16 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
 
           {/* Group Backgrounds */}
           {Object.entries(data.flowCode.groups).map(([groupId, group]) => {
-            const groupName = group.name; // Get the name from JSON
+            const groupName = group.name;
+            // Positions of all nodes in this group
             return (
               <GroupBackground
                 key={groupId}
                 groupId={groupId}
                 name={groupName}
                 positions={nodes
-                  .filter((node) => node.group === groupId)
-                  .map((node) => positions[node.id])
+                  .filter((n) => n.group === groupId)
+                  .map((n) => positions[n.id])
                   .filter(Boolean) as Position[]}
               />
             );
@@ -149,9 +156,7 @@ export function ExecutionGraph({ data, onNodeClick }: ExecutionGraphProps) {
           {edges.map((edge) => {
             const startPos = positions[edge.source];
             const endPos = positions[edge.target];
-
             if (!startPos || !endPos) return null;
-
             return (
               <Edge
                 key={`${edge.source}-${edge.target}`}
